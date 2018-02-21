@@ -14,8 +14,8 @@ import Shadow
 
 /// The data or view used to configure the button
 ///
-/// - key: Displays the key in the button
-/// - text: Displays the string in the button
+/// - key: Displays text in the button that should be directly input when pressed
+/// - text: Displays text in the button
 /// - image: Display an image in the button
 /// - customView: A custom view is added to the button. Pop-in support is disabled for buttons configured with custom views.
 public enum KeyboardButtonType {
@@ -192,15 +192,13 @@ open class KeyboardButton: UIView {
     if let imageSize = style.imageSize {
       padding = (min(frame.size.height, frame.size.width) - imageSize) / 2
     }
-
-    let paddedFrame = CGRect(
-        x: padding,
-        y: padding,
-        width: frame.size.width - (padding * 2),
-        height: frame.size.height - (padding * 2))
     
-    imageView?.frame = paddedFrame
-    customView?.frame = paddedFrame
+    imageView?.frame = CGRect(
+      x: padding,
+      y: padding,
+      width: frame.size.width - (padding * 2),
+      height: frame.size.height - (padding * 2))
+    customView?.frame = bounds
   }
 
   // MARK: KeyPop
