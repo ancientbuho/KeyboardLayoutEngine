@@ -96,6 +96,9 @@ open class KeyPop: UIView {
       imageView.image = image
       contentView = imageView
       addSubview(imageView)
+    case .customView:
+      // no pop support for custom views
+      break
     }
   }
 

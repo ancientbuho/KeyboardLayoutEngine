@@ -87,7 +87,7 @@ open class CustomKeyboardLayout {
   open var lowercase: KeyboardLayout
   open var numbers: KeyboardLayout
   open var symbols: KeyboardLayout
-
+  
   public init() {
     uppercase = KeyboardLayout(
       style: CustomKeyboardLayoutStyle,
@@ -162,14 +162,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Numbers.rawValue),
-            KeyboardButton(
-              type: .image(UIImage(
-                named: "Globe",
-                in: Bundle(for: CustomKeyboard.self),
-                compatibleWith: nil)),
-              style: CustomKeyboardGlobeButtonStyle,
-              width: .relative(percent: 0.115),
-              identifier: CustomKeyboardIdentifier.Globe.rawValue),
+            CustomKeyboardLayout.createGlobeButton(),
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -257,14 +250,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Numbers.rawValue),
-            KeyboardButton(
-              type: .image(UIImage(
-                named: "Globe",
-                in: Bundle(for: CustomKeyboard.self),
-                compatibleWith: nil)),
-              style: CustomKeyboardGlobeButtonStyle,
-              width: .relative(percent: 0.115),
-              identifier: CustomKeyboardIdentifier.Globe.rawValue),
+            CustomKeyboardLayout.createGlobeButton(),
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -352,14 +338,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Numbers.rawValue),
-            KeyboardButton(
-              type: .image(UIImage(
-                named: "Globe",
-                in: Bundle(for: CustomKeyboard.self),
-                compatibleWith: nil)),
-              style: CustomKeyboardGlobeButtonStyle,
-              width: .relative(percent: 0.115),
-              identifier: CustomKeyboardIdentifier.Globe.rawValue),
+            CustomKeyboardLayout.createGlobeButton(),
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -443,14 +422,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Letters.rawValue),
-            KeyboardButton(
-              type: .image(UIImage(
-                named: "Globe",
-                in: Bundle(for: CustomKeyboard.self),
-                compatibleWith: nil)),
-              style: CustomKeyboardGlobeButtonStyle,
-              width: .relative(percent: 0.115),
-              identifier: CustomKeyboardIdentifier.Globe.rawValue),
+            CustomKeyboardLayout.createGlobeButton(),
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -534,14 +506,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Letters.rawValue),
-            KeyboardButton(
-              type: .image(UIImage(
-                named: "Globe",
-                in: Bundle(for: CustomKeyboard.self),
-                compatibleWith: nil)),
-              style: CustomKeyboardGlobeButtonStyle,
-              width: .relative(percent: 0.115),
-              identifier: CustomKeyboardIdentifier.Globe.rawValue),
+            CustomKeyboardLayout.createGlobeButton(),
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -555,5 +520,72 @@ open class CustomKeyboardLayout {
         ),
       ]
     )
+  }
+  
+  // MARK: - Globe button
+  private static func createGlobeButton() -> KeyboardButton {
+    let button: KeyboardButton
+    if #available(iOSApplicationExtension 10.0, *) {
+      let underlyingButton = UIButton(type: .system)
+      underlyingButton.setImage(globeImage, for: .normal)
+      button = KeyboardButton(
+        type: .customView(underlyingButton),
+        style: CustomKeyboardGlobeButtonStyle,
+        width: .relative(percent: 0.115),
+        identifier: CustomKeyboardIdentifier.Globe.rawValue)
+    } else {
+      button = KeyboardButton(
+        type: .image(globeImage),
+        style: CustomKeyboardGlobeButtonStyle,
+        width: .relative(percent: 0.115),
+        identifier: CustomKeyboardIdentifier.Globe.rawValue)
+    }
+    return button
+  }
+  
+  private static let globeImage = UIImage(named: "Globe", in: Bundle(for: CustomKeyboard.self), compatibleWith: nil)?.withRenderingMode(.alwaysOriginal)
+  
+  private weak var _globeButtonsTarget: AnyObject?
+  
+  @available(iOSApplicationExtension 10.0, *)
+  /// The target of the globe button. Setting this property enables switching keyboards via this button
+  public weak var globeButtonsTarget: AnyObject? {
+    get {
+      return _globeButtonsTarget
+    }
+    set {
+      guard _globeButtonsTarget !== newValue else {
+        return
+      }
+      
+      [uppercase, lowercase, uppercaseToggled, numbers, symbols].forEach {
+        guard let globeButton = $0.findGlobeButton() else {
+          return
+        }
+        if _globeButtonsTarget != nil {
+          globeButton.removeTarget(_globeButtonsTarget, action: #selector(UIInputViewController.handleInputModeList(from:with:)), for: .allTouchEvents)
+        }
+        globeButton.addTarget(newValue, action: #selector(UIInputViewController.handleInputModeList(from:with:)), for: .allTouchEvents)
+        _globeButtonsTarget = newValue
+      }
+    }
+  }  
+}
+
+fileprivate extension KeyboardLayout {
+  func findGlobeButton() -> UIButton? {
+    for row in rows {
+      let character = row.characters.first(where: {
+        if let keyboardButton = $0 as? KeyboardButton, keyboardButton.identifier == CustomKeyboardIdentifier.Globe.rawValue {
+          return true
+        }
+        return false
+      }) as? KeyboardButton
+      
+      if let character = character, let customButtonView = character.customView as? UIButton {
+        return customButtonView
+      }
+    }
+    return nil
   }
 }

@@ -20,7 +20,7 @@ import UIKit
 
 // MARK: - CustomKeyboard
 open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
-  open var keyboardLayout = CustomKeyboardLayout()
+  open var keyboardLayout: CustomKeyboardLayout!
   open weak var delegate: CustomKeyboardDelegate?
 
   // MARK: CustomKeyobardShiftState
