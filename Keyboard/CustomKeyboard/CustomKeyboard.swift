@@ -22,6 +22,10 @@ import UIKit
 open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
   open var keyboardLayout: CustomKeyboardLayout!
   open weak var delegate: CustomKeyboardDelegate?
+  
+  struct CodingKeys {
+    static let needsInputModeSwitchKey = "needsInputModeSwitchKey"
+  }
 
   // MARK: CustomKeyobardShiftState
   public enum CustomKeyboardShiftState {
@@ -71,23 +75,37 @@ open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
   }
 
   // MARK: Init
-  public init() {
+  
+  
+  /// Initializes a custom keyboard
+  ///
+  /// - Parameter needsInputModeSwitchKey: if true, a button for switching the input is added to the keyboard.
+  /// - SeeAlso: 'UIInputViewController.needsInputModeSwitchKey'
+  public init(needsInputModeSwitchKey: Bool) {
+    self.needsInputModeSwitchKey = needsInputModeSwitchKey
     super.init(frame: CGRect.zero)
     defaultInit()
   }
-
+  
   public override init(frame: CGRect) {
+    needsInputModeSwitchKey = false
     super.init(frame: frame)
     defaultInit()
   }
 
   public required init?(coder aDecoder: NSCoder) {
+    needsInputModeSwitchKey = aDecoder.decodeBool(forKey: CodingKeys.needsInputModeSwitchKey)
     super.init(coder: aDecoder)
     defaultInit()
   }
+  
+  open override func encode(with aCoder: NSCoder) {
+    super.encode(with: aCoder)
+    aCoder.encode(needsInputModeSwitchKey, forKey: CodingKeys.needsInputModeSwitchKey)
+  }
 
   fileprivate func defaultInit() {
-    keyboardLayout = CustomKeyboardLayout()
+    keyboardLayout = CustomKeyboardLayout(needsInputModeSwitchKey: needsInputModeSwitchKey)
     keyboardLayoutStateDidChange(oldState: nil, newState: keyboardLayoutState)
   }
 
@@ -160,9 +178,11 @@ open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
     currentLayout.delegate = nil
     currentLayout.removeFromSuperview()
     // Reload layout
-    keyboardLayout = CustomKeyboardLayout()
+    keyboardLayout = CustomKeyboardLayout(needsInputModeSwitchKey: needsInputModeSwitchKey)
     keyboardLayoutStateDidChange(oldState: nil, newState: keyboardLayoutState)
   }
+  
+  private let needsInputModeSwitchKey: Bool
 
   // MARK: Capitalize
   open func switchToLetters(shiftState shift: CustomKeyboardShiftState) {

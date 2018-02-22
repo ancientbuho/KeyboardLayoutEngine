@@ -88,7 +88,7 @@ open class CustomKeyboardLayout {
   open var numbers: KeyboardLayout
   open var symbols: KeyboardLayout
   
-  public init() {
+  public init(needsInputModeSwitchKey: Bool) {
     uppercase = KeyboardLayout(
       style: CustomKeyboardLayoutStyle,
       rows: [
@@ -162,7 +162,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Numbers.rawValue),
-            CustomKeyboardLayout.createGlobeButton(),
+            needsInputModeSwitchKey ? CustomKeyboardLayout.createGlobeButton() : nil,
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -172,7 +172,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardReturnButtonStyle,
               width: .relative(percent: 0.18),
               identifier: CustomKeyboardIdentifier.Return.rawValue),
-          ]
+          ].flatMap({$0})
         ),
       ]
     )
@@ -250,7 +250,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Numbers.rawValue),
-            CustomKeyboardLayout.createGlobeButton(),
+            needsInputModeSwitchKey ? CustomKeyboardLayout.createGlobeButton() : nil,
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -260,7 +260,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardReturnButtonStyle,
               width: .relative(percent: 0.18),
               identifier: CustomKeyboardIdentifier.Return.rawValue),
-          ]
+          ].flatMap {$0}
         ),
       ]
     )
@@ -338,7 +338,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Numbers.rawValue),
-            CustomKeyboardLayout.createGlobeButton(),
+            needsInputModeSwitchKey ? CustomKeyboardLayout.createGlobeButton() : nil,
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -348,7 +348,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardReturnButtonStyle,
               width: .relative(percent: 0.18),
               identifier: CustomKeyboardIdentifier.Return.rawValue),
-          ]
+          ].flatMap {$0}
         ),
       ]
     )
@@ -422,7 +422,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Letters.rawValue),
-            CustomKeyboardLayout.createGlobeButton(),
+            needsInputModeSwitchKey ? CustomKeyboardLayout.createGlobeButton() : nil,
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -432,7 +432,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardReturnButtonStyle,
               width: .relative(percent: 0.18),
               identifier: CustomKeyboardIdentifier.Return.rawValue),
-          ]
+          ].flatMap {$0}
         ),
       ]
     )
@@ -506,7 +506,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardNumbersButtonStyle,
               width: .relative(percent: 0.115),
               identifier: CustomKeyboardIdentifier.Letters.rawValue),
-            CustomKeyboardLayout.createGlobeButton(),
+            needsInputModeSwitchKey ? CustomKeyboardLayout.createGlobeButton() : nil,
             KeyboardButton(
               type: .text("space"),
               style: CustomKeyboardSpaceButtonStyle,
@@ -516,7 +516,7 @@ open class CustomKeyboardLayout {
               style: CustomKeyboardReturnButtonStyle,
               width: .relative(percent: 0.18),
               identifier: CustomKeyboardIdentifier.Return.rawValue),
-          ]
+          ].flatMap {$0}
         ),
       ]
     )
