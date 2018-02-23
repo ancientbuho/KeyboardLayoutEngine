@@ -88,7 +88,9 @@ open class CustomKeyboardLayout {
   open var numbers: KeyboardLayout
   open var symbols: KeyboardLayout
   
-  public init(needsInputModeSwitchKey: Bool) {
+  public static let defaultKeyPopsEnabled = true
+  
+  public init(needsInputModeSwitchKey: Bool, keyPopsEnabled: Bool = CustomKeyboardLayout.defaultKeyPopsEnabled) {
     uppercase = KeyboardLayout(
       style: CustomKeyboardLayoutStyle,
       rows: [
@@ -520,6 +522,14 @@ open class CustomKeyboardLayout {
         ),
       ]
     )
+
+    if !keyPopsEnabled {
+      allLayouts.forEach { layout in
+        layout.allButtons.forEach { button in
+          button.style.keyPopType = nil
+        }
+      }
+    }
   }
   
   // MARK: - Globe button
@@ -558,7 +568,7 @@ open class CustomKeyboardLayout {
         return
       }
       
-      [uppercase, lowercase, uppercaseToggled, numbers, symbols].forEach {
+      allLayouts.forEach {
         guard let globeButton = $0.findGlobeButton() else {
           return
         }
@@ -569,23 +579,18 @@ open class CustomKeyboardLayout {
         _globeButtonsTarget = newValue
       }
     }
-  }  
+  }
+  
+  private lazy var allLayouts: [KeyboardLayout] = {
+    return [uppercase, lowercase, uppercaseToggled, numbers, symbols]
+  }()
 }
 
 fileprivate extension KeyboardLayout {
-  func findGlobeButton() -> UIButton? {
-    for row in rows {
-      let character = row.characters.first(where: {
-        if let keyboardButton = $0 as? KeyboardButton, keyboardButton.identifier == CustomKeyboardIdentifier.Globe.rawValue {
-          return true
-        }
-        return false
-      }) as? KeyboardButton
-      
-      if let character = character, let customButtonView = character.customView as? UIButton {
-        return customButtonView
-      }
-    }
-    return nil
+  func findGlobeButton() -> UIButton? {    
+    let button = allButtons.first(where: {
+       $0.identifier == CustomKeyboardIdentifier.Globe.rawValue && $0.customView is UIButton
+    })
+    return button?.customView as? UIButton
   }
 }

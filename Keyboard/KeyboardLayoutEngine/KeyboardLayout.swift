@@ -73,6 +73,14 @@ open class KeyboardLayout: UIView {
   open var rows: [KeyboardRow]!
 
   open weak var delegate: KeyboardLayoutDelegate?
+  
+  
+  /// Recursively get all the buttons in rows within the layout
+  public var allButtons: [KeyboardButton] {
+    return rows.map {$0.allButtons}.reduce([], { (res, buttons) -> [KeyboardButton] in
+      return res + buttons
+    })
+  }
 
   fileprivate var isPortrait: Bool {
     return UIScreen.main.bounds.size.width < UIScreen.main.bounds.size.height

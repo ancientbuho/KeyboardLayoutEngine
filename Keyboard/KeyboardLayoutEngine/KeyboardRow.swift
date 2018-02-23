@@ -67,6 +67,18 @@ open class KeyboardRow: UIView {
       bottom: isPortrait ? -style.bottomPadding : -style.bottomPaddingLandscape,
       right: -(style.buttonsPadding / 2.0))
   }
+  
+  /// Recursively get all the buttons within the row
+  public var allButtons: [KeyboardButton] {
+    return characters.map { (object) -> [KeyboardButton] in
+      if let button = object as? KeyboardButton {
+        return [button]
+      } else if let row = object as? KeyboardRow {
+        return row.allButtons
+      }
+      return []
+    }.flatMap {$0}
+  }
 
   // MARK: Init
   public init(style: KeyboardRowStyle, characters: [AnyObject]) {

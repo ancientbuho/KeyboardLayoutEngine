@@ -25,6 +25,7 @@ open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
   
   struct CodingKeys {
     static let needsInputModeSwitchKey = "needsInputModeSwitchKey"
+    static let keyPopsEnabled = "keyPopsEnabled"
   }
 
   // MARK: CustomKeyobardShiftState
@@ -80,21 +81,25 @@ open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
   /// Initializes a custom keyboard
   ///
   /// - Parameter needsInputModeSwitchKey: if true, a button for switching the input is added to the keyboard.
+  /// - Parameter keyPopsEnabled: if true, buttons don't show key pops.
   /// - SeeAlso: 'UIInputViewController.needsInputModeSwitchKey'
-  public init(needsInputModeSwitchKey: Bool) {
+  public init(needsInputModeSwitchKey: Bool, keyPopsEnabled: Bool = CustomKeyboardLayout.defaultKeyPopsEnabled) {
     self.needsInputModeSwitchKey = needsInputModeSwitchKey
+    self.keyPopsEnabled = keyPopsEnabled
     super.init(frame: CGRect.zero)
     defaultInit()
   }
   
   public override init(frame: CGRect) {
     needsInputModeSwitchKey = false
+    keyPopsEnabled = CustomKeyboardLayout.defaultKeyPopsEnabled
     super.init(frame: frame)
     defaultInit()
   }
 
   public required init?(coder aDecoder: NSCoder) {
     needsInputModeSwitchKey = aDecoder.decodeBool(forKey: CodingKeys.needsInputModeSwitchKey)
+    keyPopsEnabled = aDecoder.decodeBool(forKey: CodingKeys.keyPopsEnabled)
     super.init(coder: aDecoder)
     defaultInit()
   }
@@ -102,10 +107,11 @@ open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
   open override func encode(with aCoder: NSCoder) {
     super.encode(with: aCoder)
     aCoder.encode(needsInputModeSwitchKey, forKey: CodingKeys.needsInputModeSwitchKey)
+    aCoder.encode(keyPopsEnabled, forKey: CodingKeys.keyPopsEnabled)
   }
 
   fileprivate func defaultInit() {
-    keyboardLayout = CustomKeyboardLayout(needsInputModeSwitchKey: needsInputModeSwitchKey)
+    keyboardLayout = CustomKeyboardLayout(needsInputModeSwitchKey: needsInputModeSwitchKey, keyPopsEnabled: keyPopsEnabled)
     keyboardLayoutStateDidChange(oldState: nil, newState: keyboardLayoutState)
   }
 
@@ -183,6 +189,7 @@ open class CustomKeyboard: UIView, KeyboardLayoutDelegate {
   }
   
   private let needsInputModeSwitchKey: Bool
+  private let keyPopsEnabled: Bool
 
   // MARK: Capitalize
   open func switchToLetters(shiftState shift: CustomKeyboardShiftState) {
