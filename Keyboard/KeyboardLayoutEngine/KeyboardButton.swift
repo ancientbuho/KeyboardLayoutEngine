@@ -26,10 +26,19 @@ public enum KeyboardButtonType {
 }
 
 // MARK: - KeyboardButtonWidth
+
+
+/// Defines how the width of the button is determined
+///
+/// - dynamic: the layout engine automatically sets the button's width
+/// - static: the button has a fixed width
+/// - relative: the button's width is a percentage of its row's width
+/// - custom: the button's width is calculated by a closure using trait collections and its row's width
 public enum KeyboardButtonWidth {
   case dynamic
   case `static`(width: CGFloat)
   case relative(percent: CGFloat)
+  case custom( (UITraitCollection, CGFloat) -> (CGFloat) )
 }
 
 // MARK: - KeyboardButtonStyle
