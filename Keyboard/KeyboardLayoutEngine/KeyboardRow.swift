@@ -157,6 +157,11 @@ open class KeyboardRow: UIView {
     let cleanWidth = frame.size.width - totalPadding
     return cleanWidth * percent
   }
+  
+  fileprivate func getCustomButtonContainerWidth() -> CGFloat {
+    let padding = getLeadingPadding() + getTrailingPadding()
+    return frame.size.width - padding
+  }
 
   fileprivate func getWidthForKeyboardButton(_ button: KeyboardButton) -> CGFloat {
     switch button.widthInRow {
@@ -167,7 +172,7 @@ open class KeyboardRow: UIView {
     case .relative(let percent):
       return getRelativeWidthForPercent(percent)
     case .custom(let customWidth):
-      return customWidth(traitCollection, frame.size.width)
+      return customWidth(traitCollection, getCustomButtonContainerWidth())
     }
   }
 
@@ -188,7 +193,7 @@ open class KeyboardRow: UIView {
           totalStaticWidthButtonsWidth += getRelativeWidthForPercent(percent)
           break
         case .custom(let customWidth):
-          totalCustomWidth += customWidth(traitCollection, frame.size.width)
+          totalCustomWidth += customWidth(traitCollection, getCustomButtonContainerWidth())
           break
 
          }
