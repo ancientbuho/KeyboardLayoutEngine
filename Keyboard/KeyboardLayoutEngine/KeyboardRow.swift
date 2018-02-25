@@ -105,15 +105,15 @@ open class KeyboardRow: UIView {
   // MARK: Paddings
 
   func getLeadingPadding() -> CGFloat {
-    return isPortrait ? style.leadingPadding : style.leadingPaddingLandscape ?? style.leadingPadding
+    return isPortrait ? style.leadingPadding : style.leadingPaddingLandscape
   }
 
   func getTrailingPadding() -> CGFloat {
-    return isPortrait ? style.trailingPadding : style.trailingPaddingLandscape ?? style.trailingPadding
+    return isPortrait ? style.trailingPadding : style.trailingPaddingLandscape
   }
 
   func getButtonsPadding() -> CGFloat {
-    return isPortrait ? style.buttonsPadding : style.buttonsPaddingLandscape ?? style.buttonsPadding
+    return isPortrait ? style.buttonsPadding : style.buttonsPaddingLandscape
   }
 
   // MARK: Layout
@@ -166,12 +166,15 @@ open class KeyboardRow: UIView {
       return width
     case .relative(let percent):
       return getRelativeWidthForPercent(percent)
+    case .custom(let customWidth):
+      return customWidth(traitCollection, frame.size.width)
     }
   }
 
   fileprivate func getOptimumButtonWidth() -> CGFloat {
     var charactersWithDynamicWidthCount: Int = 0
     var totalStaticWidthButtonsWidth: CGFloat = 0
+    var totalCustomWidth: CGFloat = 0
     var totalChildRowPadding: CGFloat = 0
 
     for character in characters {
@@ -184,6 +187,10 @@ open class KeyboardRow: UIView {
         case .relative(let percent):
           totalStaticWidthButtonsWidth += getRelativeWidthForPercent(percent)
           break
+        case .custom(let customWidth):
+          totalCustomWidth += customWidth(traitCollection, frame.size.width)
+          break
+
          }
       } else if let row = character as? KeyboardRow {
         totalChildRowPadding += row.getLeadingPadding() + row.getTrailingPadding()
@@ -195,6 +202,7 @@ open class KeyboardRow: UIView {
     let totalButtonPadding: CGFloat = max(0, CGFloat(characters.count - 1) * getButtonsPadding())
     let totalPadding = totalButtonPadding +
       totalStaticWidthButtonsWidth +
+      totalCustomWidth +
       totalChildRowPadding +
       getLeadingPadding() +
       getTrailingPadding()
